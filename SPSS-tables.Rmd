@@ -6,85 +6,58 @@ output: html_document
 ---
 
 ```{r imports, include=FALSE, echo=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+
+# import the required libraries
 library(expss)
 library(foreign)
 library(openxlsx)
+
 ```
 
 ## R Markdown
 
 
-```{r data, echo=FALSE}
-# analysis
-#data("mtcars")
-
-data <- read.spss("C:/Users/nick.koleits/Desktop/Nov 19 PS.sav",
-                  use.value.labels=TRUE, 
-                  to.data.frame=TRUE,
-                  max.value.labels=Inf, 
-                  trim.factor.names=FALSE)
-#head(data)
-#dim(data)
+```{r data, include=FALSE, echo=FALSE}
+# read in the required data
+data(mtcars)
+mtcars = apply_labels(mtcars,
+                      mpg = "Miles/(US) gallon",
+                      cyl = "Number of cylinders",
+                      disp = "Displacement (cu.in.)",
+                      hp = "Gross horsepower",
+                      drat = "Rear axle ratio",
+                      wt = "Weight (1000 lbs)",
+                      qsec = "1/4 mile time",
+                      vs = "Engine",
+                      vs = c("V-engine" = 0,
+                             "Straight engine" = 1),
+                      am = "Transmission",
+                      am = c("Automatic" = 0,
+                             "Manual"=1),
+                      gear = "Number of forward gears",
+                      carb = "Number of carburetors"
+)
+head(data)
+dim(data)
 ```
 
 
 ```{r set-values, echo=FALSE}
-# analysis
-# set labels
-# mtcars = apply_labels(mtcars,
-#                       mpg = "Miles/(US) gallon",
-#                       cyl = "Number of cylinders",
-#                       disp = "Displacement (cu.in.)",
-#                       hp = "Gross horsepower",
-#                       drat = "Rear axle ratio",
-#                       wt = "Weight (1000 lbs)",
-#                       qsec = "1/4 mile time",
-#                       vs = "Engine",
-#                       vs = c("V-engine" = 0,
-#                              "Straight engine" = 1),
-#                       am = "Transmission",
-#                       am = c("Automatic" = 0,
-#                              "Manual"=1),
-#                       gear = "Number of forward gears",
-#                       carb = "Number of carburetors")
+# Table column % with multiple banners
+cro_cpct(mtcars$cyl, list(total(), mtcars$am, mtcars$vs))
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
 ```{r table1, echo=FALSE}
-tab <- data %>%
-    tab_cells(q2) %>% 
-    tab_cols(total(), Gender) %>% 
-    tab_stat_cpct() %>% 
-    tab_pivot()
-tab
 
-wb = createWorkbook()
-sh = addWorksheet(wb, "Tables")
-xl_write(tab, wb, sh)
-saveWorkbook(wb, "table1.xlsx", overwrite = TRUE)
 ```
 
-```{r table2, echo=FALSE}
+```{r export-to-excel, echo=FALSE}
 
-# # just simple crosstabulation, similar to base R 'table' function
-# cro(mtcars$am, mtcars$vs)
-# 
-# # Table column % with multiple banners
-# cro_cpct(mtcars$cyl, list(total(), mtcars$am, mtcars$vs))
-
-# # table with caption
-# tab <- data %>% 
-#   tab_cells(q1, q2, q3, q4) %>%
-#   tab_cols(total(), Gender, Remoteness, State., ATSI_Flag) %>% 
-#   tab_stat_mean_sd_n() %>%
-#   tab_stat_cpct() %>%
-#   tab_last_sig_means(subtable_marks = "both", sig_level = 0.05, bonferroni = TRUE) %>% 
-#   tab_pivot() %>% 
-#   set_caption("Table with summary statistics and significance marks.")
-# tab
-# 
-# # getwd()
-# # setwd("C:/Users/nick.koleits/Desktop")
+# # export tables to Excel
+# wb = createWorkbook()
+# sh = addWorksheet(wb, "Tables")
+# xl_write(tab, wb, sh)
+# saveWorkbook(wb, "outputs/table1.xlsx", overwrite = TRUE)
 
 ```
